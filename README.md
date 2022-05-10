@@ -2,10 +2,34 @@
 Ceci est un ensemble de lien et de source 
 
 ## Sommaire
- - [](#)
+ - [Boutton](#boutton)
+ - [LED](#led)
  - [Écran](#écran)
  - [Moteur](#moteur)
- - [](#moteur)
+
+## Boutton
+```python
+import digitalio
+
+boutton = digitalio.DigitalInOut(board.GP4) # GP doit il faut choisir en fonction du cablage
+boutton.direction = Direction.INPUT
+boutton.pull = Pull.UP # ou bien Pull.DOWN
+
+#Pour lire la valeur du boutton
+#cela depand de la valeur du pull
+# if boutton.value:
+# if not boutton.value:
+```
+
+## LED
+```python
+import digitalio
+
+LED = digitalio.DigitalInOut(board.GP4) # GP doit il faut choisir en fonction du cablage
+LED.direction = digitalio.Direction.OUTPUT
+LED.value = True # Pour allumer la led
+LED.value = False # Pour éteindre la led 
+```
 
 ## Écran
 Pour plus d'information: https://docs.circuitpython.org/projects/st7789/en/latest/
