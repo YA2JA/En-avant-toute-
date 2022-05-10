@@ -94,3 +94,8 @@ mot1Plus = pwmio.PWMOut(board.GP8, frequency = 10000)
 mot1Moins.duty_cycle = 0
 mot1Plus.duty_cycle = 0
 ```
+![la photo](./Screenshot_20220510-220615.jpg)
+
+
+      
+    
