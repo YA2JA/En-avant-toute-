@@ -176,6 +176,92 @@ mot1Plus.duty_cycle = 0
 
 ![la photo](./Screenshot_20220510-220615.jpg)
 
+```python
+import board
+import busio
+import digitalio
+import time
+import terminalio
+import adafruit_adxl34x
+from math import atan2,pi
+import displayio
+from adafruit_st7789 import ST7789
+from adafruit_display_text import label
+from adafruit_simplemath import map_range
+from adafruit_display_shapes.rect import Rect
 
+displayio.release_displays()
+
+busI2C = busio.I2C(scl=board.GP21, sda=board.GP20)
+
+accelerometer = adafruit_adxl34x.ADXL345(busI2C)
+
+bus_spi = busio.SPI(clock=board.GP18, MOSI=board.GP19)
+bus_affichage = displayio.FourWire(bus_spi, command=board.GP16,chip_select=board.GP17)
+ecran = ST7789(bus_affichage, width=240, height=240, rowstart=80, rotation = 180 )
+
+groupe_calibrage = displayio.Group()
+
+fond_noir = open('Images/Calibration_fond.bmp', 'rb')
+image1 = displayio.OnDiskBitmap(fond_noir)
+fond_noir_bmp = displayio.TileGrid(image1, pixel_shader=displayio.ColorConverter())
+groupe_calibrage.append(fond_noir_bmp)
+
+texte = label.Label(terminalio.FONT, x=15, y=120, scale=2, text='offset en cours...', color=0xFFFFFF)
+groupe_calibrage.append(texte)
+
+ecran.show(groupe_calibrage)
+accelerometer.offset = 0,0,0
+
+def offset ():
+    ax0 = []
+    ay0 = []
+    az0 = []
+    for i in range(10):
+        ax0.append(accelerometer.raw_x)
+        ay0.append(accelerometer.raw_y)
+        az0.append(accelerometer.raw_z)
+        time.sleep(0.2)
+    Xoffset = -round((sum(ax0)/(len(ax0)))/4.138)
+    Yoffset = -round((sum(ay0)/(len(ay0)))/4.138)
+    Zoffset = -round(((sum(az0)/len(az0)) - 256)/4)
+    return Xoffset,Yoffset,Zoffset
+
+accelerometer.offset = offset()
+
+groupe_elements = displayio.Group()
+
+roulis = label.Label(terminalio.FONT, x=15, y=120, scale=1, text='', color=0xFFFFFF)
+groupe_elements.append(roulis)
+
+tangage = label.Label(terminalio.FONT, x=15, y=140, scale=1, text='', color=0xFFFFFF)
+groupe_elements.append(tangage)
+
+bulleh = Rect(115, 193, 3, 30, outline=0x0, stroke=3, fill=0x0)
+groupe_elements.append(bulleh)
+bullhh = Rect(77, 193, 3, 30, outline=0x0, stroke=3, fill=0x0)
+groupe_elements.append(bullhh)
+
+bullev = Rect(193,115,30,3 , outline=0x0, stroke=3, fill=0x0)
+groupe_elements.append(bullev)
+bullvv = Rect(193,77 , 30,3 , outline=0x0, stroke=3, fill=0x0)
+groupe_elements.append(bullvv)
+
+ecran.show(groupe_elements)
+
+
+while True:
+    alpha = (atan2(accelerometer.raw_z,accelerometer.raw_y)/(2*pi))*360
+    teta = (atan2(accelerometer.raw_z,accelerometer.raw_x))/(2*pi)*360
+    if alpha >= 0:
+        roulis.text = f"angle de roulis = {int(alpha)} degres"
+        Bulle_V_bmp.y = int(map_range(alpha,180,0,20,140))
+    if teta >= 0:
+        tangage.text = f"angle de tangage = {int(teta)} degres"
+        Bulle_H_bmp.x = int(map_range(teta,0,180,20,140))
+    print(alpha,teta)
+    time.sleep(0.1)
+
+```
       
     
